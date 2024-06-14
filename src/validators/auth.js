@@ -41,7 +41,22 @@ const signin = (req, res, next) => {
     validatorHandler(req, res, next, schema);
 };
 
+const signinSession = (req, res, next) => {
+    const schema = Joi.object().keys({
+        email: Joi.string()
+            .trim()
+            .email()
+            .required(),
+        token: Joi.string()
+            .trim()
+            // .pattern(new RegExp('^[a-zA-Z0-9]{6,30}$'))
+            .required()
+    });
+    validatorHandler(req, res, next, schema);
+};
+
 module.exports = {
     signup,
-    signin
+    signin,
+    signinSession
 };

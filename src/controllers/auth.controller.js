@@ -1,6 +1,8 @@
+const { cache } = require('joi');
 const User = require('../models/user.model');
 const { hash: hashPassword, compare: comparePassword } = require('../utils/password');
-const { generate: generateToken } = require('../utils/token');
+const { generate: generateToken, decode: decodeToken } = require('../utils/token');
+const { error } = require('winston');
 
 exports.signup = (req, res) => {
     const { firstname, lastname, email, password } = req.body;
@@ -65,4 +67,26 @@ exports.signin = (req, res) => {
         }
     });
 
+}
+
+exports.signinSessionValidate = (req, res) => {
+    const { email, token } = req.body;
+
+    const validateToken = decodeToken(token);
+    // console.log("check decodeToken result", testToken);
+   
+    if (validateToken?.level == 'error') {
+        res.status(400).send({
+            status: 'error',
+            error: validateToken,
+            message: validateToken?.message
+        });
+    } else {
+        res.status(200).send({
+            status: 'success',
+            data: validateToken,
+            message: 'Valid token'
+        });
+    }
+   
 }

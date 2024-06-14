@@ -9,6 +9,7 @@ const decode = (token) => {
         return jwt.verify(token, JWT_SECRET_KEY)
     } catch (error) {
         logger.error(error);
+        return error;
     }
 };
 
