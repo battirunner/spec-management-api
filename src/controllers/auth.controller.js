@@ -1,5 +1,6 @@
 const { cache } = require('joi');
 const User = require('../models/user.model');
+const Invitation = require('../models/invitation.model');
 const { hash: hashPassword, compare: comparePassword } = require('../utils/password');
 const { generate: generateToken, decode: decodeToken } = require('../utils/token');
 const { error } = require('winston');
@@ -89,4 +90,30 @@ exports.signinSessionValidate = (req, res) => {
         });
     }
    
+}
+
+exports.inviteUser = (req, res) => {
+    const { email, role } = req.body;
+    const token = generateToken(...{email, role});
+
+    const invitation = new Invitation(email.trim(), role.trim(), token, new Date(Date.now() + 24 * 60 * 60 * 1000));
+
+    Invitation.create(invitation, (err, data, token) => {
+        if (err) {
+            res.status(500).send({
+                status: "error",
+                message: err.message
+            });
+        } else {
+            // const token = generateToken(data.id);
+            res.status(201).send({
+                status: "success",
+                data: {
+                    token,
+                    data
+                }
+            });
+        }
+    });
+    
 }
